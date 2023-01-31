@@ -21,7 +21,7 @@ function handleButtonClick(event) {
       break
   }
 
-  fetch(`http://localhost:8080/generate/${endpoint}`, { method: 'GET' })
+  fetch(`https://swn-generate.herokuapp.com/generate/${endpoint}`, { method: 'GET' })
     .then(response => {
       if (!response.ok) {
         throw new Error(response.statusText)
