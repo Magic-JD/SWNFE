@@ -18,6 +18,7 @@ button {
   display: inline-block;
   font-family: 'Orbitron', sans-serif;
 }
+
 #display {
   display: block;
   text-align: center;
