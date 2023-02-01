@@ -19,6 +19,9 @@ function handleButtonClick(event) {
     case 'urban-encounter-button':
       endpoint = 'encounter/urban'
       break
+    case 'problem-button':
+      endpoint = 'problem'
+      break
   }
 
   fetch(`https://swn-generate.herokuapp.com/generate/${endpoint}`, { method: 'GET' })
