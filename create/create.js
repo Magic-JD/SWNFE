@@ -1,6 +1,6 @@
 const endpoints = [
-  { endpoint: "stat-block", display: "stat-block-display" },
-  { endpoint: "origin", display: "origin-display" }
+  { endpoint: "stat-block", display: "stat-block-display", tooltip: false},
+  { endpoint: "origin", display: "origin-display", tooltip: true }
 ];
 
 let currentEndpoint = 0;
@@ -14,7 +14,18 @@ function handleStatBlockClick(event) {
       return response.text()
     })
     .then(text => {
-      document.getElementById(endpoints[currentEndpoint].display).innerHTML = text.replace(/\n/g, '<br>').replace("'", "&#39;")
+      const element = endpoints[currentEndpoint];
+      const display = document.getElementById(element.display);
+      display.innerHTML += text.replace(/\n/g, '<br>').replace("'", "&#39;");
+      if(element.tooltip){
+        const tippyInstance = tippy(display, {
+          arrow: true,
+          theme: "dark",
+          delay: [0, 100]
+        })
+        getTooltip(tippyInstance, element.endpoint)
+      }
+
       currentEndpoint++;
       if (currentEndpoint >= endpoints.length) {
           document.getElementById("primary-button").style.display = "none";
@@ -29,4 +40,21 @@ function handleStatBlockClick(event) {
     })
 }
 
-document.getElementById("primary-button").addEventListener('click', handleStatBlockClick)
+function getTooltip(tippyInstance, url){
+    fetch(`https://swn-generate.herokuapp.com/create/pc/tooltip/${url}`, { method: 'GET' })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(response.statusText)
+        }
+        return response.text()
+      })
+      .then(text => {
+        tippyInstance.setContent(text)
+        return text
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error)
+      })
+}
+
+document.getElementById("primary-button").addEventListener('click', handleStatBlockClick);
