@@ -38,18 +38,3 @@ div {
   text-align: left;
   margin-bottom: 16px;
 }
-
-.tippy-popper{
-  margin-top: 0px;
-}
-
-.tippy-tooltip{
-  margin-top: 0px;
-  top: 0px;
-}
-
-.tippy-content {
-  background-color: #444;
-  color: white;
-  font-size: 12px;
-}

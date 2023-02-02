@@ -19,13 +19,11 @@ function handleStatBlockClick(event) {
       display.innerHTML += text.replace(/\n/g, '<br>').replace("'", "&#39;");
       if(element.tooltip){
         const tippyInstance = tippy(display, {
-          arrow: false,
-          placement: 'left',
-          animation: 'scale',
-          interactive: true,
+          arrow: true,
+          theme: "dark",
           delay: [0, 100]
         })
-        getTooltip(tippyInstance, element.endpoint + "/" + text.split(" ")[1].toLowerCase().replace(/\W/g, ""))
+        getTooltip(tippyInstance, element.endpoint)
       }
 
       currentEndpoint++;
@@ -51,7 +49,7 @@ function getTooltip(tippyInstance, url){
         return response.text()
       })
       .then(text => {
-        tippyInstance.setContent(text.replace(/\n/g, '<br>').replace("'", "&#39;"))
+        tippyInstance.setContent(text)
         return text
       })
       .catch(error => {
