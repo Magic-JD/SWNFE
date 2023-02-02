@@ -39,15 +39,6 @@ function handleButtonClick(event) {
     })
 }
 
-function handleRedirect(event){
-  window.location.replace("../create/pc.html");
-}
-
 document.querySelectorAll('button').forEach(button => {
-  if(button.id == "pc-button"){
-    button.addEventListener('click', handleRedirect)
-  } else {
-    button.addEventListener('click', handleButtonClick)
-  }
-
+  button.addEventListener('click', handleButtonClick)
 })
