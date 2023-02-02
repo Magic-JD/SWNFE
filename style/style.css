@@ -20,7 +20,7 @@ button {
 
 div {
   position:relative;
-  display: block;
+  display: flex;
   text-align: center;
   margin-top: 16px;
   min-height: 50px;
@@ -37,6 +37,17 @@ div {
   text-align: left;
   margin-bottom: 16px;
   font-family: 'Orbitron', sans-serif;
+}
+
+.btn-group {
+  display: grid;
+  justify-content: center;
+  grid-template-columns: repeat(5, 1fr);
+  grid-column-gap: 16px;
+}
+
+.unseen{
+  display: none;
 }
 
 .tippy-popper{
