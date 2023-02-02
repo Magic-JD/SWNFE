@@ -5,8 +5,8 @@ function handleButtonClick(event) {
       endpoint = 'beast'
       break
     case 'standard-npc-button':
-       endpoint = 'npc/standard'
-       break
+      endpoint = 'npc/standard'
+      break
     case 'patron-button':
       endpoint = 'npc/patron'
       break
@@ -24,7 +24,7 @@ function handleButtonClick(event) {
       break
   }
 
-  fetch(`https://swn-generate.herokuapp.com/generate/${endpoint}`, { method: 'GET' })
+  fetch(`http://localhost:8080/generate/${endpoint}`, { method: 'GET' })
     .then(response => {
       if (!response.ok) {
         throw new Error(response.statusText)
@@ -32,7 +32,10 @@ function handleButtonClick(event) {
       return response.text()
     })
     .then(text => {
-      document.getElementById('display').innerHTML = text.replace(/\n/g, '<br>').replace("'", "&#39;")
+      let properties = JSON.parse(text).properties;
+      details = ""
+      properties.forEach(p => details += p.name + ": " + p.details + '<br>');
+      document.getElementById('display').innerHTML = details
     })
     .catch(error => {
       console.error('Error fetching data:', error)
