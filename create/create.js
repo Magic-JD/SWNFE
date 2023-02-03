@@ -1,5 +1,5 @@
 import { handleDisplay } from "./display.js";
-import { handleGenerateClick, handleUsersRequest, presetClick } from "./handler.js";
+import { handleGenerateClickStats, handleUsersRequest, handlePresetClickOrigin, handleGenerateClickOrigin, handleSkillsButton } from "./handler.js";
 import { createTippyInstance } from "./tippy.js";
 
 function initPreset(user, div) {
@@ -8,17 +8,17 @@ function initPreset(user, div) {
   element.className = "unseen"
   div.prepend(element);
   element.innerHTML = user.name;
-  element.addEventListener("click", presetClick);
+  element.addEventListener("click", handlePresetClickOrigin);
   createTippyInstance(element).setContent(user.tooltip.replace(/\n/g, '<br>').replace("'", "&#39;"))
 }
 
-document.getElementById("stat-block").addEventListener('click', handleGenerateClick);
+document.getElementById("stat-block").addEventListener('click', handleGenerateClickStats);
 handleDisplay(document.getElementById("title"))
-document.getElementById("origin").addEventListener('click', handleGenerateClick);
-
+document.getElementById("origin").addEventListener('click', handleGenerateClickOrigin);
 handleUsersRequest().then(users => {
   users.forEach(user => {
     initPreset(user, document.getElementById("origin").parentNode);
   });
 })
-
+document.getElementById("origin").addEventListener('click', handleGenerateClickOrigin);
+document.querySelectorAll(`[id^="skills"]`).forEach(element => element.addEventListener('click', handleSkillsButton));
