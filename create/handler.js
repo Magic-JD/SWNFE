@@ -153,8 +153,8 @@ function statsToString(property) {
 }
 
 function originToString(property) {
-  const checkName = property.name.replace(/\n/g, '')
-  const details = property.details.replace(/-0/g, '')
+  const checkName = property.name.replace(/\n/g, '').replace(/^\s*[\r\n]/gm, '');
+  const details = property.details.replace(/-0/g, '').replace(/^\s*[\r\n]/gm, '');
   if (checkName == freeSkillName) {
     freeSkill = details;
   } else if (checkName == quickSkillsName) {
