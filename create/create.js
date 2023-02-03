@@ -10,7 +10,7 @@ function handleGenerateClick(event) {
       display = event.target.parentNode
       let properties = JSON.parse(text).properties;
       details = ""
-      properties.forEach(p => details += p.name + ": " + p.details + '<br>');
+      properties.forEach(p => details += p.name + ": " + p.details.replace(/\n/g, '<br>').replace("'", "&#39;") + '<br>');
       display.innerHTML = details
       handleDisplay(display)
     })
@@ -30,7 +30,7 @@ function presetClick(event) {
     .then(text => {
       let properties = JSON.parse(text).properties;
       details = ""
-      properties.forEach(p => details += p.name + ": " + p.details + '<br>');
+      properties.forEach(p => details += p.name + ": " + p.details.replace(/\n/g, '<br>').replace("'", "&#39;") + '<br>');
       display = event.target.parentNode
       display.innerHTML = details
       handleDisplay(display)
