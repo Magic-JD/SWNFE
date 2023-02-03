@@ -1,4 +1,4 @@
-import { presetClickRequest, handleGenerateClickRequest, getTooltipRequest } from "./requests.js";
+import { presetClickRequest, handleGenerateClickRequest, makeUsersRequest } from "./requests.js";
 import { handleDisplay } from "./display.js";
 
 
@@ -10,10 +10,11 @@ export function presetClick(event) {
   process(event, presetClickRequest(event))
 }
 
-export function getTooltip(tippyInstance, url) {
-  getTooltipRequest(url)
+export function handleUsersRequest() {
+  return makeUsersRequest()
     .then(text => {
-      tippyInstance.setContent(text.replace(/\n/g, '<br>').replace("'", "&#39;"))
+      let users = JSON.parse(text).origins;
+      return users;
     })
     .catch(error => {
       console.error('Error fetching data:', error)

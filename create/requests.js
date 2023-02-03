@@ -6,8 +6,8 @@ export function presetClickRequest(event) {
     return handleClickRequest(`https://swn-generate.herokuapp.com/create/pc/origin/${event.target.id}`);
 }
 
-export function getTooltipRequest(url) {
-    return handleClickRequest(`https://swn-generate.herokuapp.com/create/pc/tooltip/origin/${url}`);
+export function makeUsersRequest() {
+    return handleClickRequest(`https://swn-generate.herokuapp.com/create/pc/origin/all`);
 }
 
 function handleClickRequest(url) {
