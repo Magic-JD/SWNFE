@@ -43,5 +43,6 @@ function handleButtonClick(event) {
 }
 
 document.querySelectorAll('button').forEach(button => {
+  if(button.id != "backarrow")
   button.addEventListener('click', handleButtonClick)
 })

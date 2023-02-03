@@ -19,13 +19,12 @@ button {
 }
 
 div {
-  position:relative;
+  position: relative;
   display: flex;
   text-align: center;
   margin-top: 16px;
   min-height: 50px;
   padding: 16px;
-  text-align: left;
   margin: 0 auto;
   width: fit-content;
   font-size: 20px;
@@ -35,8 +34,21 @@ div {
 #title {
   font-size: 62px;
   text-align: left;
+  float: left;
+  margin: 5px;
   margin-bottom: 16px;
   font-family: 'Orbitron', sans-serif;
+}
+
+#backarrow {
+  padding: 1px 12px;
+  margin: 1px;
+}
+
+#backarrow img {
+  height: 26px;
+  width: 32px;
+  vertical-align: middle;
 }
 
 .btn-group {
@@ -46,15 +58,15 @@ div {
   grid-column-gap: 16px;
 }
 
-.unseen{
+.unseen {
   display: none;
 }
 
-.tippy-popper{
+.tippy-popper {
   margin-top: 0px;
 }
 
-.tippy-tooltip{
+.tippy-tooltip {
   margin-top: 0px;
   top: 0px;
 }
