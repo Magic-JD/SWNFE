@@ -1,7 +1,7 @@
 import { handleDisplay } from "./display/display.js";
 import { handleGenerateClickOrigin, handlePresetClickOrigin, handleUsersRequest } from "./handlers/origin.js";
 import { addSkillsTooltip, handleSkillsButton } from "./handlers/skills.js";
-import { handleGenerateClickStats } from "./handlers/stats.js";
+import { handleGenerateClickStats, handleClickPickStats, initStatNames } from "./handlers/stats.js";
 import { createTippyInstance } from "./tippy/tippy.js";
 
 function initPreset(user, div) {
@@ -14,7 +14,7 @@ function initPreset(user, div) {
   createTippyInstance(element).setContent(user.tooltip.replace(/\n/g, '<br>').replace("'", "&#39;"))
 }
 
-
+initStatNames()
 const origin = document.getElementById("origin")
 handleUsersRequest().then(users => {
   users.reverse().forEach(user => {
@@ -22,7 +22,8 @@ handleUsersRequest().then(users => {
   });
 })
 handleDisplay(document.getElementById("title"))
-document.getElementById("stat-block").addEventListener('click', handleGenerateClickStats);
+document.getElementById("stat-block-generate").addEventListener('click', handleGenerateClickStats);
+document.getElementById("stat-block-pick").addEventListener('click', handleClickPickStats);
 origin.addEventListener('click', handleGenerateClickOrigin);
 const observer = new MutationObserver((mutations) => {
   mutations.forEach((mutation) => {

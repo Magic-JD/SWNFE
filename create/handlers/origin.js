@@ -34,5 +34,5 @@ function originToString(property) {
 }
 
 export function handleGenerateClickOrigin(event) {
-    process(event, handleGenerateClickRequest(event), originToString)
+    process(event, handleGenerateClickRequest(event.target.id), originToString)
 }

@@ -1,7 +1,7 @@
 import { setDoc } from "../../display/display.js";
 
-export function handleGenerateClickRequest(event) {
-    return handleClickRequest(`https://swn-generate.herokuapp.com/create/pc/${event.target.id}`);
+export function handleGenerateClickRequest(endpoint) {
+    return handleClickRequest(`https://swn-generate.herokuapp.com/create/pc/${endpoint}`);
 }
 
 export function presetClickRequest(event) {
