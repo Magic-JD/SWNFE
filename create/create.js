@@ -1,6 +1,8 @@
-import { handleDisplay } from "./display.js";
-import { handleGenerateClickStats, handleUsersRequest, handlePresetClickOrigin, handleGenerateClickOrigin, handleSkillsButton, addTooltip } from "./handler.js";
-import { createTippyInstance } from "./tippy.js";
+import { handleDisplay } from "./display/display.js";
+import { handleGenerateClickOrigin, handlePresetClickOrigin, handleUsersRequest } from "./handlers/origin.js";
+import { addSkillsTooltip, handleSkillsButton } from "./handlers/skills.js";
+import { handleGenerateClickStats } from "./handlers/stats.js";
+import { createTippyInstance } from "./tippy/tippy.js";
 
 function initPreset(user, div) {
   const element = document.createElement("button");
@@ -26,7 +28,7 @@ const observer = new MutationObserver((mutations) => {
   mutations.forEach((mutation) => {
     if (mutation.attributeName === "style") {
       if (getComputedStyle(mutation.target).display === "block") {
-        addTooltip(mutation.target)
+        addSkillsTooltip(mutation.target)
       }
     }
   });

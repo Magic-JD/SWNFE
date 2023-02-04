@@ -1,36 +1,45 @@
-import { presetClickRequest, handleGenerateClickRequest, makeUsersRequest, makeRollOnTableRequest } from "./requests.js";
-import { handleDisplay, shutdown } from "./display.js";
-import { createTippyInstance } from "./tippy.js";
+import { setDoc, shutdown, handleDisplay } from "../display/display.js";
+import { createTippyInstance } from "../tippy/tippy.js";
+import { makeRollOnTableRequest } from "./requests/requests.js";
+
 
 let freeSkill = "";
 let quickSkills = "";
 let growth = "";
 let learning = "";
-const freeSkillName = "Free Skill"
-const quickSkillsName = "Quick Skills"
-const growthName = "Growth"
-const learningName = "Learning"
+export const freeSkillName = "Free Skill"
+export const quickSkillsName = "Quick Skills"
+export const growthName = "Growth"
+export const learningName = "Learning"
 let skillsInfoElement = null;
 let skillsRollCount = 0;
 
 
-export function addTooltip(element){
+export function setFreeSkill(s){
+  freeSkill = s
+}
+
+export function setQuickSkills(s){
+  quickSkills = s
+}
+
+export function setGrowth(s){
+  growth = s
+}
+
+export function setLearning(s){
+  learning = s
+}
+
+export function addSkillsTooltip(element) {
   const id = element.id;
   if (id == "skills-quick") {
-    createTippyInstance(element).setContent(quickSkillsName + "<br>" + quickSkills.replace(/\n/g, '<br>'))
+    createTippyInstance(element).setContent(quickSkillsName + "<br>" + quickSkills.replace(/\n/g, '<br>'));
   } else if (id == "skills-pick") {
-    createTippyInstance(element).setContent(freeSkillName + "<br>" + freeSkill + "<br><br>" + learningName + "<br>" + learning.replace(/\n/g, '<br>'))
+    createTippyInstance(element).setContent(freeSkillName + "<br>" + freeSkill + "<br><br>" + learningName + "<br>" + learning.replace(/\n/g, '<br>'));
   } else if (id == "skills-roll") {
-    createTippyInstance(element).setContent(freeSkillName + "<br>" + freeSkill + "<br><br>" + growthName + "<br>" + growth.replace(/\n/g, '<br>') + "<br><br>" + learningName + "<br>" + learning.replace(/\n/g, '<br>'))
+    createTippyInstance(element).setContent(freeSkillName + "<br>" + freeSkill + "<br><br>" + growthName + "<br>" + growth.replace(/\n/g, '<br>') + "<br><br>" + learningName + "<br>" + learning.replace(/\n/g, '<br>'));
   }
-}
-
-export function handleGenerateClickStats(event) {
-  process(event, handleGenerateClickRequest(event), statsToString)
-}
-
-export function handleGenerateClickOrigin(event) {
-  process(event, handleGenerateClickRequest(event), originToString)
 }
 
 export function handleSkillsButton(event) {
@@ -113,58 +122,4 @@ function createSkillInfoElement(string, parentNode) {
   parentNode.insertAdjacentElement("beforebegin", element);
   element.innerHTML = string
   skillsInfoElement = element
-}
-
-export function handlePresetClickOrigin(event) {
-  process(event, presetClickRequest(event), originToString)
-}
-
-export function handleUsersRequest() {
-  return makeUsersRequest()
-    .then(text => {
-      let users = JSON.parse(text).origins;
-      return users;
-    })
-    .catch(error => {
-      console.error('Error fetching data:', error)
-    })
-}
-
-function process(event, future, handleFunction) {
-  future.then(text => {
-    let properties = JSON.parse(text).properties;
-    let details = ""
-    properties.forEach(p => details += handleFunction(p));
-    setDoc(event, details)
-  })
-    .catch(error => {
-      console.error('Error fetching data:', error)
-    })
-}
-
-function setDoc(event, string) {
-  let display = event.target.parentNode
-  display.innerHTML = string
-  handleDisplay(display)
-}
-
-function statsToString(property) {
-  return property.name + ": " + property.details.replace(/\n/g, '<br>').replace("'", "&#39;") + '<br>'
-}
-
-function originToString(property) {
-  const checkName = property.name.replace(/\n/g, '').replace(/^\s*[\r\n]/gm, '');
-  const details = property.details.replace(/-0/g, '').replace(/^\s*[\r\n]/gm, '');
-  if (checkName == freeSkillName) {
-    freeSkill = details;
-  } else if (checkName == quickSkillsName) {
-    quickSkills = details;
-  } else if (checkName == growthName) {
-    growth = details;
-  } else if (checkName == learningName) {
-    learning = details;
-  } else {
-    return property.name + ": " + property.details.replace(/\n/g, '<br>').replace(":", '<br>').replace("'", "&#39;") + '<br>' + '<br>'
-  }
-  return ""
 }

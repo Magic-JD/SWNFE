@@ -22,3 +22,9 @@ function activate(display) {
         }
     });
 }
+
+export function setDoc(event, string) {
+    let display = event.target.parentNode
+    display.innerHTML = string
+    handleDisplay(display)
+  }

@@ -1,3 +1,5 @@
+import { setDoc } from "../../display/display.js";
+
 export function handleGenerateClickRequest(event) {
     return handleClickRequest(`https://swn-generate.herokuapp.com/create/pc/${event.target.id}`);
 }
@@ -38,3 +40,15 @@ function handleClickRequest(url) {
             return response.text()
         })
 }
+
+export function process(event, future, handleFunction) {
+    future.then(text => {
+      let properties = JSON.parse(text).properties;
+      let details = ""
+      properties.forEach(p => details += handleFunction(p));
+      setDoc(event, details)
+    })
+      .catch(error => {
+        console.error('Error fetching data:', error)
+      })
+  }
