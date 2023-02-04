@@ -56,7 +56,7 @@ export function handleSkillsButton(event) {
     parentNode.style.gridGap = "16px"
     skillsRollCount = 1
     learning.split(/\n/g).forEach(s => {
-      if(s){
+      if(s && s != "Any Skill"){
         parentNode.prepend(createSkillAddButton(s.toLowerCase, s));
       }
       

@@ -11,7 +11,15 @@ function initPreset(user, div) {
   div.prepend(element);
   element.innerHTML = user.name;
   element.addEventListener("click", handlePresetClickOrigin);
-  createTippyInstance(element).setContent(user.tooltip.replace(/\n/g, '<br>').replace("'", "&#39;"))
+  let contentList = user.tooltip.replace("'", "&#39;").split(/\n\n/g).filter(s => s).map(s => s.replace(/\n/g, "<br>"))
+
+  const content = `<div style="display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: 1fr 3fr; grid-gap: 10px; min-width: 500px; max-height: 700px">
+  <div style="grid-column: span 3; text-align: center; padding: 12px; font-size: 18px; min-height:400px">${contentList[0]} <br><br> ${contentList[1]}</div>
+  <div style="text-align: center; padding: 12px; font-size: 18px">${contentList[2]}</div>
+  <div style="text-align: center; padding: 12px; font-size: 18px">${contentList[3]}</div>
+  <div style="text-align: center; padding: 12px; font-size: 18px">${contentList[4]}</div>
+</div>`
+  createTippyInstance(element).setContent(content)
 }
 
 initStatNames()

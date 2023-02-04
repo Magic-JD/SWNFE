@@ -9,13 +9,14 @@ body {
 button {
   background-color: #444;
   color: #fff;
-  padding: 16px 32px;
+  padding: 10px 10px;
   text-align: center;
-  font-size: 16px;
+  font-size: 22px;
   border-radius: 5px;
   cursor: pointer;
   margin: 16px;
   display: inline-block;
+  font-family: 'Lato', sans-serif;
 }
 
 div {
@@ -27,7 +28,7 @@ div {
   padding: 16px;
   margin: 0 auto;
   width: fit-content;
-  font-size: 20px;
+  font-size: 22px;
   line-height: 1.5;
 }
 
@@ -60,6 +61,8 @@ div {
 
 .unseen {
   display: none;
+  font-size: 22px;
+  font-family: 'Lato', sans-serif;
 }
 
 .tippy-popper {
@@ -74,5 +77,5 @@ div {
 .tippy-content {
   background-color: #444;
   color: white;
-  font-size: 12px;
+  font-size: 18px;
 }
