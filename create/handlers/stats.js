@@ -31,7 +31,7 @@ function createStatsInfoElement(string, parentNode) {
   return element
 }
 
-function createStatApplyString(){
+function createStatApplyString() {
   return `Apply ${pickValues[pickValueIndex]} to the selected stat.`
 }
 
@@ -40,21 +40,21 @@ function pickStatListener(event) {
   const parentNode = element.parentNode
   parentNode.removeChild(element)
   statsInfoElement.innerHTML += "<br>" + event.target.innerHTML + ": " + pickValues[pickValueIndex]
-  pickValueIndex+=1
+  pickValueIndex += 1
   let outOfIndex = pickValueIndex >= pickValues.length
   statsInfoElement.innerHTML = sortStats(statsInfoElement.innerHTML, outOfIndex)
-  if(outOfIndex){
+  if (outOfIndex) {
     handleDisplay(parentNode)
   }
 }
 
-function sortStats(string, outOfIndex){
+function sortStats(string, outOfIndex) {
   let list = string.split('<br>')
   list.shift()
   string = list.sort((a, b) => statProperties.find(e2 => e2.name == a.split(":")[0]).priority - statProperties.find(e1 => e1.name == b.split(":")[0]).priority).join('<br>')
-  if(outOfIndex){
+  if (outOfIndex) {
     return string
-  }else {
+  } else {
     return createStatApplyString() + "<br>" + string
   }
 }
@@ -68,14 +68,14 @@ function createStatAddButton(id, details, listener) {
 }
 
 export function handleGenerateClickStats(event) {
-      let details = ""
-      statProperties.forEach(p => details += statsToString(p));
-      let display = event.target.parentNode
-      statsInfoElement = createStatsInfoElement(`Apply ${pickValues[0]} to chosen stat<br>${details}`, display)
-      shutdown(display)
-      statProperties.forEach(p => {
-        display.append(createStatAddButton(p.name.toLowerCase, p.name, pickStatClickListener));
-      })
+  let details = ""
+  statProperties.forEach(p => details += statsToString(p));
+  let display = event.target.parentNode
+  statsInfoElement = createStatsInfoElement(`Apply ${pickValues[0]} to chosen stat<br>${details}`, display)
+  shutdown(display)
+  statProperties.forEach(p => {
+    display.append(createStatAddButton(p.name.toLowerCase, p.name, pickStatClickListener));
+  })
 }
 
 function pickStatClickListener(event) {
@@ -85,7 +85,7 @@ function pickStatClickListener(event) {
   let list = statsInfoElement.innerHTML.split('<br>')
   list.shift()
   list = list.map(s => {
-    if(s.startsWith(element.innerHTML)){
+    if (s.startsWith(element.innerHTML)) {
       return `${element.innerHTML}: ${pickValues[pickValueIndex]}`
     }
     return s
