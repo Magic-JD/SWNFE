@@ -1,6 +1,6 @@
 import { setDoc, shutdown, handleDisplay } from "../display/display.js";
 import { createTippyInstance } from "../tippy/tippy.js";
-import { makeRollOnTableRequest } from "./requests/requests.js";
+import { makeRollOnTableRequest, makeSkillsUpdateRequest } from "./requests/requests.js";
 
 
 let freeSkill = "";
@@ -13,21 +13,23 @@ export const growthName = "Growth"
 export const learningName = "Learning"
 let skillsInfoElement = null;
 let skillsRollCount = 0;
+let skills = []
+let availableSkills = []
 
 
-export function setFreeSkill(s){
+export function setFreeSkill(s) {
   freeSkill = s
 }
 
-export function setQuickSkills(s){
+export function setQuickSkills(s) {
   quickSkills = s
 }
 
-export function setGrowth(s){
+export function setGrowth(s) {
   growth = s
 }
 
-export function setLearning(s){
+export function setLearning(s) {
   learning = s
 }
 
@@ -45,25 +47,28 @@ export function addSkillsTooltip(element) {
 export function handleSkillsButton(event) {
   const button = event.target;
   const id = button.id;
+  skills.push(freeSkill)
   if (id == "skills-quick") {
     setDoc(event, quickSkills.replace(/\n/g, '<br>'))
   } else if (id == "skills-pick") {
-    const parentNode = button.parentNode
-    createSkillInfoElement(freeSkill, parentNode)
-    shutdown(parentNode)
-    parentNode.style.display = "grid"
-    parentNode.style.gridTemplateColumns = "repeat(4, 1fr)"
-    parentNode.style.gridGap = "16px"
-    skillsRollCount = 1
-    learning.split(/\n/g).forEach(s => {
-      if(s && s != "Any Skill"){
-        parentNode.prepend(createSkillAddButton(s.toLowerCase, s));
-      }
-      
-    })
+    availableSkills = learning.split(/\n/g).filter(s => s)
+    makeSkillsUpdateRequest(skills, null, availableSkills).then(text => {
+      availableSkills = JSON.parse(text).choices;
+      const parentNode = button.parentNode
+      createSkillInfoElement(skills, parentNode)
+      shutdown(parentNode)
+      parentNode.style.display = "grid"
+      parentNode.style.gridTemplateColumns = "repeat(4, 1fr)"
+      parentNode.style.gridGap = "16px"
+      skillsRollCount = 1
+      availableSkills.forEach(choice => {
+        parentNode.prepend(createSkillAddButton(choice.name.toLowerCase, choice.name));
+      })
+    });
+
   } else if (id == "skills-roll") {
     const parentNode = button.parentNode
-    createSkillInfoElement(freeSkill, parentNode)
+    createSkillInfoElement(skills, parentNode)
     shutdown(parentNode)
     parentNode.prepend(createSkillRollOnTableButton("growth", growthName, handleRollOnTableGrowth));
     parentNode.prepend(createSkillRollOnTableButton("learning", learningName, handleRollOnTableLearning));
@@ -83,8 +88,13 @@ function createSkillAddButton(id, details) {
   element.id = id
   element.innerHTML = details
   element.addEventListener("click", event => {
-    skillsInfoElement.innerHTML += "<br>" + details;
-    updateRolls(element.parentElement)
+    makeSkillsUpdateRequest(skills, details, availableSkills.map(skill => skill.name)).then(text => {
+      const furtherChoices = JSON.parse(text)
+      skillsInfoElement.innerHTML += "<br>" + furtherChoices.toAdd;
+      skills.push(furtherChoices.toAdd)
+      updateRolls(element.parentElement)
+    })
+
   });
   return element
 }
@@ -97,7 +107,7 @@ function handleRollOnTableLearning(event) {
   handleRollOnTable(event, makeRollOnTableRequest(learningName, learning))
 }
 
-function handleRollOnTable(event, fun){
+function handleRollOnTable(event, fun) {
   fun.then(text => {
     let property = JSON.parse(text);
     skillsInfoElement.innerHTML += "<br>" + property.name + ": " + property.details
@@ -114,12 +124,14 @@ function updateRolls(parentNode) {
   }
 }
 
-function createSkillInfoElement(string, parentNode) {
-  const element = document.createElement("div");
-  element.style.clear = "both";
-  element.style.display = "flex";
-  element.style.justifyContent = "center";
-  parentNode.insertAdjacentElement("beforebegin", element);
-  element.innerHTML = string
-  skillsInfoElement = element
+function createSkillInfoElement(strings, parentNode) {
+  if (!skillsInfoElement) {
+    const element = document.createElement("div");
+    element.style.clear = "both";
+    element.style.display = "flex";
+    element.style.justifyContent = "center";
+    parentNode.insertAdjacentElement("beforebegin", element);
+    skillsInfoElement = element
+  }
+  skillsInfoElement.innerHTML = strings.join('<br>')
 }

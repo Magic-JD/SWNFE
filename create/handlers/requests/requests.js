@@ -31,6 +31,27 @@ export function makeRollOnTableRequest(requestName, tableData){
     })
 }
 
+export function makeSkillsUpdateRequest(chosen, pending, available){
+    return fetch(`https://swn-generate.herokuapp.com/create/pc/skills/update`, {
+        method: 'POST', 
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          chosen: chosen,
+          pending: pending,
+          available: available
+        })
+      })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(response.statusText)
+        }
+        return response.text()
+    })
+}
+
+
 function handleClickRequest(url) {
     return fetch(url, { method: 'GET' })
         .then(response => {
