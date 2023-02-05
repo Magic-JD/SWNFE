@@ -47,23 +47,31 @@ export function addSkillsTooltip(element) {
 export function handleSkillsButton(event) {
   const button = event.target;
   const id = button.id;
-  skills.push(freeSkill)
   if (id == "skills-quick") {
     setDoc(event, quickSkills.replace(/\n/g, '<br>'))
   } else if (id == "skills-pick") {
     availableSkills = learning.split(/\n/g).filter(s => s)
-    makeSkillsUpdateRequest(skills, null, availableSkills).then(text => {
-      availableSkills = JSON.parse(text).choices;
+    makeSkillsUpdateRequest([], freeSkill, availableSkills).then(text => {
+      const furtherSkills = JSON.parse(text)
+      availableSkills = furtherSkills.choices;
       const parentNode = button.parentNode
       createSkillInfoElement(skills, parentNode)
       shutdown(parentNode)
       parentNode.style.display = "grid"
       parentNode.style.gridTemplateColumns = "repeat(4, 1fr)"
       parentNode.style.gridGap = "16px"
-      skillsRollCount = 1
-      availableSkills.forEach(choice => {
-        parentNode.prepend(createSkillAddButton(choice.name.toLowerCase, choice.name));
-      })
+      
+      if (furtherSkills.followUp.length > 0) {
+        furtherSkills.followUp.forEach(choice => {
+          parentNode.prepend(createSkillAddButton(choice.name.toLowerCase, choice.name));
+        })
+      } else {
+        skillsRollCount = 1
+        availableSkills.forEach(choice => {
+          parentNode.prepend(createSkillAddButton(choice.name.toLowerCase, choice.name));
+        })
+      }
+
     });
 
   } else if (id == "skills-roll") {
