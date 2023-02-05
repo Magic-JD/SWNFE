@@ -90,13 +90,23 @@ function createSkillAddButton(id, details) {
   element.addEventListener("click", event => {
     makeSkillsUpdateRequest(skills, details, availableSkills.map(skill => skill.name)).then(text => {
       const furtherChoices = JSON.parse(text)
-      skillsInfoElement.innerHTML += "<br>" + furtherChoices.toAdd;
-      skills.push(furtherChoices.toAdd)
       shutdown(element.parentNode)
-      furtherChoices.choices.forEach(choice => {
-        element.parentNode.prepend(createSkillAddButton(choice.name.toLowerCase, choice.name));
-      })
-      updateRolls(element.parentElement)
+      if (furtherChoices.followUp.length > 0) {
+        furtherChoices.followUp.forEach(choice => {
+          element.parentNode.prepend(createSkillAddButton(choice.name.toLowerCase, choice.name));
+        })
+      } else {
+        skillsInfoElement.innerHTML += "<br>" + furtherChoices.toAdd;
+        skills.push(furtherChoices.toAdd)
+        furtherChoices.choices.forEach(choice => {
+          element.parentNode.prepend(createSkillAddButton(choice.name.toLowerCase, choice.name));
+        })
+        updateRolls(element.parentElement)
+      }
+
+
+
+
     })
 
   });
