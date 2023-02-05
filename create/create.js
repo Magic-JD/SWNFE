@@ -13,11 +13,11 @@ function initPreset(user, div) {
   element.addEventListener("click", handlePresetClickOrigin);
   let contentList = user.tooltip.replace("'", "&#39;").split(/\n\n/g).filter(s => s).map(s => s.replace(/\n/g, "<br>"))
 
-  const content = `<div style="display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: 1fr 3fr; grid-gap: 10px; min-width: 500px; max-height: 700px">
-  <div style="grid-column: span 3; text-align: center; padding: 12px; font-size: 18px; min-height:400px">${contentList[0]} <br><br> ${contentList[1]}</div>
-  <div style="text-align: center; padding: 12px; font-size: 18px">${contentList[2]}</div>
-  <div style="text-align: center; padding: 12px; font-size: 18px">${contentList[3]}</div>
-  <div style="text-align: center; padding: 12px; font-size: 18px">${contentList[4]}</div>
+  const content = `<div style="display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: 1fr 3fr; grid-gap: 10px; min-width: 700px; max-height: 400px">
+  <div style="grid-column: span 3; text-align: center; padding: 12px; font-size: 14px; min-height:150px">${contentList[0]}</div>
+  <div style="text-align: center; padding: 12px; font-size: 14px">${contentList[1]} <br><br> ${contentList[2]}</div>
+  <div style="text-align: center; padding: 12px; font-size: 14px">${contentList[3]}</div>
+  <div style="text-align: center; padding: 12px; font-size: 14px">${contentList[4]}</div>
 </div>`
   createTippyInstance(element).setContent(content)
 }
@@ -29,6 +29,7 @@ handleUsersRequest().then(users => {
     initPreset(user, origin.parentNode);
   });
 })
+
 handleDisplay(document.getElementById("title"))
 document.getElementById("stat-block-generate").addEventListener('click', handleGenerateClickStats);
 document.getElementById("stat-block-pick").addEventListener('click', handleClickPickStats);

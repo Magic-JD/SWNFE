@@ -92,6 +92,10 @@ function createSkillAddButton(id, details) {
       const furtherChoices = JSON.parse(text)
       skillsInfoElement.innerHTML += "<br>" + furtherChoices.toAdd;
       skills.push(furtherChoices.toAdd)
+      shutdown(element.parentNode)
+      furtherChoices.choices.forEach(choice => {
+        element.parentNode.prepend(createSkillAddButton(choice.name.toLowerCase, choice.name));
+      })
       updateRolls(element.parentElement)
     })
 
