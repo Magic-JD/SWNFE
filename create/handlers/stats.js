@@ -1,14 +1,14 @@
 import { process, handleGenerateClickRequest } from "./requests/requests.js";
 import { handleDisplay, shutdown } from "../display/display.js";
 
-let names = null;
+let statProperties = null;
 const pickValues = ["14 [+1]", "12 [0]", "11 [0]", "10 [0]", "9 [0]", "7 [-1]"]
 let pickValueIndex = 0
 let statsInfoElement = null;
 
 export function initStatNames() {
-  handleGenerateClickRequest("stat-block/names").then(text => {
-    names = JSON.parse(text).propertyNames;
+  handleGenerateClickRequest("stat-block").then(text => {
+    statProperties = JSON.parse(text).properties.sort((a, b) => a.priority - b.priority);
   })
 }
 
@@ -16,10 +16,8 @@ export function handleClickPickStats(event) {
   let display = event.target.parentNode
   statsInfoElement = createStatsInfoElement(createStatApplyString(), display)
   shutdown(display)
-  names.forEach(s => {
-    if (s) {
-      display.append(createStatAddButton(s.toLowerCase, s, pickStatListener));
-    }
+  statProperties.forEach(p => {
+    display.append(createStatAddButton(p.name.toLowerCase, p.name, pickStatListener));
   })
 }
 
@@ -44,21 +42,21 @@ function pickStatListener(event) {
   statsInfoElement.innerHTML += "<br>" + event.target.innerHTML + ": " + pickValues[pickValueIndex]
   pickValueIndex+=1
   let outOfIndex = pickValueIndex >= pickValues.length
-  statsInfoElement.innerHTML = alphabetizeString(statsInfoElement.innerHTML, outOfIndex)
+  statsInfoElement.innerHTML = sortStats(statsInfoElement.innerHTML, outOfIndex)
   if(outOfIndex){
     handleDisplay(parentNode)
   }
 }
 
-function alphabetizeString(string, outOfIndex){
+function sortStats(string, outOfIndex){
   let list = string.split('<br>')
+  list.shift()
+  string = list.sort((a, b) => statProperties.find(e2 => e2.name == a.split(":")[0]).priority - statProperties.find(e1 => e1.name == b.split(":")[0]).priority).join('<br>')
   if(outOfIndex){
-    list.shift()
+    return string
   }else {
-    list[0] = createStatApplyString()
+    return createStatApplyString() + "<br>" + string
   }
-  
-  return list.sort().join('<br>')
 }
 
 function createStatAddButton(id, details, listener) {
@@ -70,21 +68,14 @@ function createStatAddButton(id, details, listener) {
 }
 
 export function handleGenerateClickStats(event) {
-  handleGenerateClickRequest("stat-block").then(
-    text => {
-      let properties = JSON.parse(text).properties;
       let details = ""
-      properties.forEach(p => details += statsToString(p));
+      statProperties.forEach(p => details += statsToString(p));
       let display = event.target.parentNode
       statsInfoElement = createStatsInfoElement(`Apply ${pickValues[0]} to chosen stat<br>${details}`, display)
       shutdown(display)
-      names.forEach(s => {
-        if (s) {
-          display.append(createStatAddButton(s.toLowerCase, s, pickStatClickListener));
-        }
+      statProperties.forEach(p => {
+        display.append(createStatAddButton(p.name.toLowerCase, p.name, pickStatClickListener));
       })
-    }
-  )
 }
 
 function pickStatClickListener(event) {
@@ -103,5 +94,5 @@ function pickStatClickListener(event) {
 }
 
 function statsToString(property) {
-  return property.name + ": " + property.details.replace(/\n/g, '<br>').replace("'", "&#39;") + '<br>'
+  return `${property.name}: ${property.value} ${property.mod}<br>`
 }
