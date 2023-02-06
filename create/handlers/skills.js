@@ -45,17 +45,28 @@ export function addSkillsTooltip(element) {
 }
 
 export function handleSkillsButton(event) {
+  createSkillInfoElement(skills, event.target.parentNode)
   const button = event.target;
   const id = button.id;
   if (id == "skills-quick") {
-    setDoc(event, quickSkills.replace(/\n/g, '<br>'))
+    skills = quickSkills.split(/\n/g);
+    skills.forEach(skill => makeSkillsUpdateRequest([], skill, []).then(text => {
+      const furtherSkills = JSON.parse(text)
+      if(furtherSkills.followUp.length > 0){
+        shutdown(event.target.parentNode)
+          furtherSkills.followUp.forEach(choice => {
+            event.target.parentNode.prepend(createSkillAddButton(choice.name.toLowerCase, choice.name));
+          })
+      } else {
+        skillsInfoElement.innerHTML += "<br>" + furtherSkills.toAdd;
+      }
+    }))
   } else if (id == "skills-pick") {
     availableSkills = learning.split(/\n/g).filter(s => s)
     makeSkillsUpdateRequest([], freeSkill, availableSkills).then(text => {
       const furtherSkills = JSON.parse(text)
       availableSkills = furtherSkills.choices;
       const parentNode = button.parentNode
-      createSkillInfoElement(skills, parentNode)
       shutdown(parentNode)
       parentNode.style.display = "grid"
       parentNode.style.gridTemplateColumns = "repeat(4, 1fr)"
@@ -76,7 +87,6 @@ export function handleSkillsButton(event) {
 
   } else if (id == "skills-roll") {
     const parentNode = button.parentNode
-    createSkillInfoElement(skills, parentNode)
     shutdown(parentNode)
     parentNode.prepend(createSkillRollOnTableButton("growth", growthName, handleRollOnTableGrowth));
     parentNode.prepend(createSkillRollOnTableButton("learning", learningName, handleRollOnTableLearning));
