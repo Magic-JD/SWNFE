@@ -24,7 +24,6 @@ div {
   display: flex;
   text-align: center;
   margin-top: 16px;
-  min-height: 50px;
   padding: 16px;
   margin: 0 auto;
   width: fit-content;

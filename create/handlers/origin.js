@@ -1,11 +1,14 @@
 import { quickSkillsName, setQuickSkills, freeSkillName, setFreeSkill, learningName, setLearning, growthName, setGrowth } from "./skills.js";
-import {presetClickRequest, makeUsersRequest, handleGenerateClickRequest, process } from "./requests/requests.js";
+import {presetClickRequest, makeUsersRequest, handleGenerateClickRequest } from "./requests/requests.js";
+import { getDisplay } from "../display/display.js";
+
+let display = getDisplay()
 
 export function handlePresetClickOrigin(event) {
     process(event, presetClickRequest(event), originToString)
 }
 
-export function handleUsersRequest() {
+export function handleUsersRequest(div) {
     return makeUsersRequest()
         .then(text => {
             let users = JSON.parse(text).origins;
@@ -35,4 +38,17 @@ function originToString(property) {
 
 export function handleGenerateClickOrigin(event) {
     process(event, handleGenerateClickRequest(event.target.id), originToString)
+}
+
+export function process(event, future, handleFunction) {
+    future.then(text => {
+        let properties = JSON.parse(text).properties;
+        let details = ""
+        properties.forEach(p => details += handleFunction(p));
+        display.replaceText(details)
+        display.update()
+    })
+        .catch(error => {
+            console.error('Error fetching data:', error)
+        })
 }

@@ -1,6 +1,6 @@
-import { setDoc, shutdown, handleDisplay } from "../display/display.js";
 import { createTippyInstance } from "../tippy/tippy.js";
 import { makeRollOnTableRequest, makeSkillsUpdateRequest } from "./requests/requests.js";
+import { getDisplay } from "../display/display.js";
 
 
 let freeSkill = "";
@@ -11,10 +11,11 @@ export const freeSkillName = "Free Skill"
 export const quickSkillsName = "Quick Skills"
 export const growthName = "Growth"
 export const learningName = "Learning"
-let skillsInfoElement = null;
 let skillsRollCount = 0;
 let skills = []
 let availableSkills = []
+
+let display = getDisplay();
 
 
 export function setFreeSkill(s) {
@@ -45,21 +46,19 @@ export function addSkillsTooltip(element) {
 }
 
 export function handleSkillsButton(event) {
-  createSkillInfoElement(skills, event.target.parentNode)
   const button = event.target;
   const id = button.id;
   if (id == "skills-quick") {
     skills = quickSkills.split(/\n/g);
-    shutdown(event.target.parentNode)
+    display.clear()
     skills.forEach(skill => makeSkillsUpdateRequest([], skill, []).then(text => {
       const furtherSkills = JSON.parse(text)
-      
       if (furtherSkills.followUp.length > 0) {
         furtherSkills.followUp.forEach(choice => {
           event.target.parentNode.prepend(createSkillAddButton(choice.name.toLowerCase, choice.name, choice.description));
         })
       } else {
-        skillsInfoElement.innerHTML += "<br>" + furtherSkills.toAdd;
+        display.addText("<br>" + furtherSkills.toAdd) ;
         updateRolls(event.target.parentNode)
       }
     }))
@@ -69,16 +68,14 @@ export function handleSkillsButton(event) {
       const furtherSkills = JSON.parse(text)
       availableSkills = furtherSkills.choices;
       const parentNode = button.parentNode
-      shutdown(parentNode)
-      parentNode.style.display = "grid"
-      parentNode.style.gridTemplateColumns = "repeat(4, 1fr)"
-      parentNode.style.gridGap = "16px"
+      display.clear()
+      display.setToGrid()
       if (furtherSkills.followUp.length > 0) {
         furtherSkills.followUp.forEach(choice => {
           parentNode.prepend(createSkillAddButton(choice.name.toLowerCase, choice.name, choice.description));
         })
       } else {
-        skillsInfoElement.innerHTML = furtherSkills.toAdd
+        display.replaceText("<br>" + furtherSkills.toAdd)
         skills.push(furtherSkills.toAdd)
         skillsRollCount = 1
         availableSkills.forEach(choice => {
@@ -90,17 +87,15 @@ export function handleSkillsButton(event) {
     makeSkillsUpdateRequest([], freeSkill, []).then(text => {
       const furtherSkills = JSON.parse(text)
       const parentNode = button.parentNode
-      shutdown(parentNode)
-      parentNode.style.display = "grid"
-      parentNode.style.gridTemplateColumns = "repeat(4, 1fr)"
-      parentNode.style.gridGap = "16px"
+      display.clear()
+      display.setToGrid()
       skillsRollCount = -1;
       if (furtherSkills.followUp.length > 0) {
         furtherSkills.followUp.forEach(choice => {
           parentNode.prepend(createSkillAddButtonFromGenerate(choice.name.toLowerCase, choice.name, choice.description));
         })
       } else {
-        skillsInfoElement.innerHTML = furtherSkills.toAdd
+        display.replaceText(furtherSkills.toAdd)
         skills.push(furtherSkills.toAdd)
         parentNode.prepend(createSkillRollOnTableButton("growth", growthName, handleRollOnTableGrowth));
         parentNode.prepend(createSkillRollOnTableButton("learning", learningName, handleRollOnTableLearning));
@@ -128,8 +123,8 @@ function createSkillAddButtonFromGenerate(id, details, description) {
   element.addEventListener("click", event => {
     makeSkillsUpdateRequest(skills, details, availableSkills.map(skill => skill.name)).then(text => {
       const furtherChoices = JSON.parse(text)
-      shutdown(element.parentNode)
-      skillsInfoElement.innerHTML += "<br>" + furtherChoices.toAdd;
+      display.clear()
+      display.addText("<br>" + furtherChoices.toAdd);
       skills.push(furtherChoices.toAdd)
       element.parentNode.prepend(createSkillRollOnTableButton("growth", growthName, handleRollOnTableGrowth));
       element.parentNode.prepend(createSkillRollOnTableButton("learning", learningName, handleRollOnTableLearning));
@@ -150,13 +145,13 @@ function createSkillAddButton(id, details, description) {
   element.addEventListener("click", event => {
     makeSkillsUpdateRequest(skills, details, availableSkills.map(skill => skill.name)).then(text => {
       const furtherChoices = JSON.parse(text)
-      shutdown(element.parentNode)
+      display.clear()
       if (furtherChoices.followUp.length > 0) {
         furtherChoices.followUp.forEach(choice => {
           element.parentNode.prepend(createSkillAddButton(choice.name.toLowerCase, choice.name, choice.description));
         })
       } else {
-        skillsInfoElement.innerHTML += "<br>" + furtherChoices.toAdd;
+        display.addText("<br>" + furtherChoices.toAdd);
         skills.push(furtherChoices.toAdd)
         furtherChoices.choices.forEach(choice => {
           element.parentNode.prepend(createSkillAddButton(choice.name.toLowerCase, choice.name, choice.description));
@@ -180,14 +175,14 @@ function handleRollOnTable(event, fun) {
   fun.then(text => {
     let furtherChoices = JSON.parse(text);
     const parentNode = event.target.parentNode
-    shutdown(parentNode)
+    display.clear()
     if (furtherChoices.followUp.length > 0) {
       furtherChoices.followUp.forEach(choice => {
         parentNode.prepend(createSkillAddButtonFromGenerate(choice.name.toLowerCase, choice.name));
       })
     } else {
       skills.push(furtherChoices.toAdd)
-      skillsInfoElement.innerHTML += "<br>" + furtherChoices.toAdd ;
+      display.addText("<br>" + furtherChoices.toAdd);
       parentNode.prepend(createSkillRollOnTableButton("growth", growthName, handleRollOnTableGrowth));
       parentNode.prepend(createSkillRollOnTableButton("learning", learningName, handleRollOnTableLearning));
       updateRolls(event.target.parentNode)
@@ -200,18 +195,6 @@ function handleRollOnTable(event, fun) {
 function updateRolls(parentNode) {
   skillsRollCount += 1;
   if (skillsRollCount == 3) {
-    handleDisplay(parentNode);
+    display.update();
   }
-}
-
-function createSkillInfoElement(strings, parentNode) {
-  if (!skillsInfoElement) {
-    const element = document.createElement("div");
-    element.style.clear = "both";
-    element.style.display = "flex";
-    element.style.justifyContent = "center";
-    parentNode.insertAdjacentElement("beforebegin", element);
-    skillsInfoElement = element
-  }
-  skillsInfoElement.innerHTML = strings.join('<br>')
 }

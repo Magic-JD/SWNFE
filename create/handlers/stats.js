@@ -1,10 +1,10 @@
 import { handleGenerateClickRequest } from "./requests/requests.js";
-import { handleDisplay, shutdown } from "../display/display.js";
+import { getDisplay } from "../display/display.js";
 
 let statProperties = null;
 const pickValues = ["14 [+1]", "12 [0]", "11 [0]", "10 [0]", "9 [0]", "7 [-1]"]
 let pickValueIndex = 0
-let statsInfoElement = null;
+let display = getDisplay();
 
 export function initStatNames() {
   handleGenerateClickRequest("stat-block").then(text => {
@@ -13,22 +13,11 @@ export function initStatNames() {
 }
 
 export function handleClickPickStats(event) {
-  let display = event.target.parentNode
-  statsInfoElement = createStatsInfoElement(createStatApplyString(), display)
-  shutdown(display)
+  display.replaceText(createStatApplyString())
+  display.clear()
   statProperties.forEach(p => {
-    display.append(createStatAddButton(p.name.toLowerCase, p.name, pickStatListener));
+    event.target.parentNode.append(createStatAddButton(p.name.toLowerCase, p.name, pickStatListener));
   })
-}
-
-function createStatsInfoElement(string, parentNode) {
-  const element = document.createElement("div");
-  element.style.clear = "both";
-  element.style.display = "flex";
-  element.style.justifyContent = "center";
-  parentNode.insertAdjacentElement("beforebegin", element);
-  element.innerHTML = string
-  return element
 }
 
 function createStatApplyString() {
@@ -39,12 +28,12 @@ function pickStatListener(event) {
   const element = event.target
   const parentNode = element.parentNode
   parentNode.removeChild(element)
-  statsInfoElement.innerHTML += "<br>" + event.target.innerHTML + ": " + pickValues[pickValueIndex]
+  display.addText("<br>" + event.target.innerHTML + ": " + pickValues[pickValueIndex]) 
   pickValueIndex += 1
   let outOfIndex = pickValueIndex >= pickValues.length
-  statsInfoElement.innerHTML = sortStats(statsInfoElement.innerHTML, outOfIndex)
+  display.replaceText(sortStats(display.retrieveText(), outOfIndex))
   if (outOfIndex) {
-    handleDisplay(parentNode)
+    display.update()
   }
 }
 
@@ -70,19 +59,16 @@ function createStatAddButton(id, details, listener) {
 export function handleGenerateClickStats(event) {
   let details = ""
   statProperties.forEach(p => details += statsToString(p));
-  let display = event.target.parentNode
-  statsInfoElement = createStatsInfoElement(`Apply ${pickValues[0]} to chosen stat<br>${details}`, display)
-  shutdown(display)
+  display.addText(`Apply ${pickValues[0]} to chosen stat<br>${details}`)
+  display.clear()
   statProperties.forEach(p => {
-    display.append(createStatAddButton(p.name.toLowerCase, p.name, pickStatClickListener));
+    event.target.parentNode.append(createStatAddButton(p.name.toLowerCase, p.name, pickStatClickListener));
   })
 }
 
 function pickStatClickListener(event) {
-  const element = event.target
-  const parentNode = element.parentNode
-  handleDisplay(parentNode)
-  let list = statsInfoElement.innerHTML.split('<br>')
+  const element = event.target  
+  let list = display.retrieveText().split('<br>')
   list.shift()
   list = list.map(s => {
     if (s.startsWith(element.innerHTML)) {
@@ -90,7 +76,8 @@ function pickStatClickListener(event) {
     }
     return s
   })
-  statsInfoElement.innerHTML = list.join('<br>')
+  display.replaceText(list.join('<br>'))
+  display.update()
 }
 
 function statsToString(property) {

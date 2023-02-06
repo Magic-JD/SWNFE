@@ -1,11 +1,8 @@
-import { handleDisplay } from "./display/display.js";
 import { handleGenerateClickOrigin, handlePresetClickOrigin, handleUsersRequest } from "./handlers/origin.js";
 import { addSkillsTooltip, handleSkillsButton } from "./handlers/skills.js";
 import { handleGenerateClickStats, handleClickPickStats, initStatNames } from "./handlers/stats.js";
 import { createTippyInstance } from "./tippy/tippy.js";
 import { handlePickClass, handlePickAdventurer } from "./handlers/class.js";
-
-handlePickClass
 
 function initPreset(user, div) {
   const element = document.createElement("button");
@@ -27,13 +24,12 @@ function initPreset(user, div) {
 
 initStatNames()
 const origin = document.getElementById("origin")
-handleUsersRequest().then(users => {
+handleUsersRequest(origin.parentNode).then(users => {
   users.reverse().forEach(user => {
     initPreset(user, origin.parentNode);
   });
 })
 
-handleDisplay(document.getElementById("title"))
 document.getElementById("stat-block-generate").addEventListener('click', handleGenerateClickStats);
 document.getElementById("stat-block-pick").addEventListener('click', handleClickPickStats);
 origin.addEventListener('click', handleGenerateClickOrigin);
