@@ -8,7 +8,7 @@ export class Display {
         this.replaceText = function (string) { this.infoElement.innerHTML = string; };
         this.retrieveText = function () { return this.infoElement.innerHTML; };
         this.infoElement = createInfoElement(this.div);
-        this.setToGrid = function () { setToGrid(div); };
+        this.setToGrid = function () { setToGrid(this.div); };
         this.setDiv = function (div) {
             this.div = div
             this.infoElement = createInfoElement(div)

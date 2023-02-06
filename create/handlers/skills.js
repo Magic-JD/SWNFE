@@ -178,7 +178,7 @@ function handleRollOnTable(event, fun) {
     display.clear()
     if (furtherChoices.followUp.length > 0) {
       furtherChoices.followUp.forEach(choice => {
-        parentNode.prepend(createSkillAddButtonFromGenerate(choice.name.toLowerCase, choice.name));
+        parentNode.prepend(createSkillAddButtonFromGenerate(choice.name.toLowerCase, choice.name, choice.description));
       })
     } else {
       skills.push(furtherChoices.toAdd)
