@@ -62,7 +62,7 @@ export function handleSkillsButton(event) {
       }
     }))
   } else if (id == "skills-pick") {
-    availableSkills = learning.split(/\n/g).filter(s => s)
+    availableSkills = learning.split(/\n/g).filter(s => s).filter(s => s != "Any Skill")
     makeSkillsUpdateRequest([], freeSkill, availableSkills).then(text => {
       const furtherSkills = JSON.parse(text)
       availableSkills = furtherSkills.choices;
@@ -71,12 +71,13 @@ export function handleSkillsButton(event) {
       parentNode.style.display = "grid"
       parentNode.style.gridTemplateColumns = "repeat(4, 1fr)"
       parentNode.style.gridGap = "16px"
-      
       if (furtherSkills.followUp.length > 0) {
         furtherSkills.followUp.forEach(choice => {
           parentNode.prepend(createSkillAddButton(choice.name.toLowerCase, choice.name));
         })
       } else {
+        skillsInfoElement.innerHTML = furtherSkills.toAdd
+        skills.push(furtherSkills.toAdd)
         skillsRollCount = 1
         availableSkills.forEach(choice => {
           parentNode.prepend(createSkillAddButton(choice.name.toLowerCase, choice.name));
@@ -121,12 +122,7 @@ function createSkillAddButton(id, details) {
         })
         updateRolls(element.parentElement)
       }
-
-
-
-
     })
-
   });
   return element
 }
