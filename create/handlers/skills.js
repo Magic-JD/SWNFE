@@ -50,10 +50,11 @@ export function handleSkillsButton(event) {
   const id = button.id;
   if (id == "skills-quick") {
     skills = quickSkills.split(/\n/g);
+    shutdown(event.target.parentNode)
     skills.forEach(skill => makeSkillsUpdateRequest([], skill, []).then(text => {
       const furtherSkills = JSON.parse(text)
+      
       if (furtherSkills.followUp.length > 0) {
-        shutdown(event.target.parentNode)
         furtherSkills.followUp.forEach(choice => {
           event.target.parentNode.prepend(createSkillAddButton(choice.name.toLowerCase, choice.name, choice.description));
         })

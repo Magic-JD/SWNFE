@@ -3,6 +3,9 @@ import { handleGenerateClickOrigin, handlePresetClickOrigin, handleUsersRequest 
 import { addSkillsTooltip, handleSkillsButton } from "./handlers/skills.js";
 import { handleGenerateClickStats, handleClickPickStats, initStatNames } from "./handlers/stats.js";
 import { createTippyInstance } from "./tippy/tippy.js";
+import { handlePickClass, handlePickAdventurer } from "./handlers/class.js";
+
+handlePickClass
 
 function initPreset(user, div) {
   const element = document.createElement("button");
@@ -48,3 +51,9 @@ document.querySelectorAll(`[id^="skills"]`).forEach(element => {
   observer.observe(element, { attributes: true });
 }
 );
+
+document.querySelectorAll(`[id^="class"]`).forEach(element => {
+  element.addEventListener('click', handlePickClass);
+}
+);
+document.getElementById("adventurer").addEventListener('click', handlePickAdventurer)

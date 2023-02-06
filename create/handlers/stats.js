@@ -1,4 +1,4 @@
-import { process, handleGenerateClickRequest } from "./requests/requests.js";
+import { handleGenerateClickRequest } from "./requests/requests.js";
 import { handleDisplay, shutdown } from "../display/display.js";
 
 let statProperties = null;
