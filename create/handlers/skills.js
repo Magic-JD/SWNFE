@@ -59,6 +59,7 @@ export function handleSkillsButton(event) {
         })
       } else {
         skillsInfoElement.innerHTML += "<br>" + furtherSkills.toAdd;
+        updateRolls(event.target.parentNode)
       }
     }))
   } else if (id == "skills-pick") {
