@@ -2,50 +2,44 @@ import { handleGenerateClickRequest } from "./requests/requests.js";
 import { getDisplay } from "../display/display.js";
 import { getPC, Stat } from "../pc/pc.js";
 
-const pickValues = ["14 [+1]", "12 [0]", "11 [0]", "10 [0]", "9 [0]", "7 [-1]"]
+const pickValues = [{ value: 14, mod: '[+1]' }, { value: 12, mod: '[0]' }, { value: 11, mod: '[0]' }, { value: 10, mod: '[0]' }, { value: 9, mod: '[0]' }, { value: 7, mod: '[-1]' }]
 let pickValueIndex = 0
 let display = getDisplay();
 let pc = getPC()
 
 export function initStatNames() {
-  handleGenerateClickRequest("stat-block").then(text => {
-    pc.stats = JSON.parse(text).properties.map(p => new Stat(p.name, p.value, p.mod, p.priority)).sort((a, b) => a.priority - b.priority);
-  })
+
 }
 
 export function handleClickPickStats(event) {
-  display.replaceText(createStatApplyString())
-  display.clear()
-  pc.stats.forEach(p => {
-    event.target.parentNode.append(createStatAddButton(p.name.toLowerCase, p.name, pickStatListener));
+  handleGenerateClickRequest("stat-block").then(text => {
+    pc.setStats(JSON.parse(text).properties.map(p => new Stat(p.name, p.value, p.priority)));
+    display.replaceText(createStatApplyString())
+    display.clear()
+    pc.stats.forEach(stat => {
+      stat.value = 0;
+      event.target.parentNode.append(createStatAddButton(stat.name.toLowerCase, stat.name, pickStatListener));
+    })
   })
+
 }
 
 function createStatApplyString() {
-  return `Apply ${pickValues[pickValueIndex]} to the selected stat.`
+  return `Apply ${pickValues[pickValueIndex].value} ${pickValues[pickValueIndex].mod} to the selected stat.<br>`
 }
 
 function pickStatListener(event) {
   const element = event.target
   const parentNode = element.parentNode
   parentNode.removeChild(element)
-  display.addText("<br>" + event.target.innerHTML + ": " + pickValues[pickValueIndex]) 
+  pc.updateStat(element.innerHTML, pickValues[pickValueIndex].value)
   pickValueIndex += 1
   let outOfIndex = pickValueIndex >= pickValues.length
-  display.replaceText(sortStats(display.retrieveText(), outOfIndex))
   if (outOfIndex) {
+    display.replaceText("")
     display.update()
-  }
-}
-
-function sortStats(string, outOfIndex) {
-  let list = string.split('<br>')
-  list.shift()
-  string = list.sort((a, b) => pc.stats.find(e2 => e2.name == a.split(":")[0]).priority - pc.stats.find(e1 => e1.name == b.split(":")[0]).priority).join('<br>')
-  if (outOfIndex) {
-    return string
   } else {
-    return createStatApplyString() + "<br>" + string
+    display.replaceText(createStatApplyString())
   }
 }
 
@@ -58,29 +52,20 @@ function createStatAddButton(id, details, listener) {
 }
 
 export function handleGenerateClickStats(event) {
-  let details = ""
-  pc.stats.forEach(p => details += statsToString(p));
-  display.addText(`Apply ${pickValues[0]} to chosen stat<br>${details}`)
-  display.clear()
-  pc.stats.forEach(p => {
-    event.target.parentNode.append(createStatAddButton(p.name.toLowerCase, p.name, pickStatClickListener));
+  handleGenerateClickRequest("stat-block").then(text => {
+    pc.setStats(JSON.parse(text).properties.map(p => new Stat(p.name, p.value, p.priority)));
+    display.addText(createStatApplyString())
+    display.clear()
+    pc.stats.forEach(p => {
+      event.target.parentNode.append(createStatAddButton(p.name.toLowerCase, p.name, pickStatClickListener));
+    })
   })
+
 }
 
 function pickStatClickListener(event) {
-  const element = event.target  
-  let list = display.retrieveText().split('<br>')
-  list.shift()
-  list = list.map(s => {
-    if (s.startsWith(element.innerHTML)) {
-      return `${element.innerHTML}: ${pickValues[pickValueIndex]}`
-    }
-    return s
-  })
-  display.replaceText(list.join('<br>'))
+  const element = event.target
+  pc.updateStat(element.innerHTML, pickValues[pickValueIndex].value)
+  display.replaceText("")
   display.update()
-}
-
-function statsToString(property) {
-  return `${property.name}: ${property.value} ${property.mod}<br>`
 }

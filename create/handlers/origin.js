@@ -1,15 +1,27 @@
 import { quickSkillsName, setQuickSkills, freeSkillName, setFreeSkill, learningName, setLearning, growthName, setGrowth } from "./skills.js";
-import {presetClickRequest, makeUsersRequest, handleGenerateClickRequest } from "./requests/requests.js";
+import {presetOriginRequest, makeAllOriginsRequest, handleGenerateClickRequest } from "./requests/requests.js";
 import { getDisplay } from "../display/display.js";
+import { getPC } from "../pc/pc.js";
 
 let display = getDisplay()
+let pc = getPC()
 
-export function handlePresetClickOrigin(event) {
-    process(event, presetClickRequest(event), originToString)
+let origin = {
+    name: null,
+    shortDescription: null,
+    longDescription: null,
+    freeSkill: null,
+    quickSkills: [],
+    growth: [],
+    learning: []
 }
 
-export function handleUsersRequest(div) {
-    return makeUsersRequest()
+export function handlePresetClickOrigin(event) {
+    process(event, presetOriginRequest(event), originToString)
+}
+
+export function handleAllOriginsRequest(div) {
+    return makeAllOriginsRequest()
         .then(text => {
             let users = JSON.parse(text).origins;
             return users;
@@ -24,13 +36,20 @@ function originToString(property) {
     const details = property.details.replace(/-0/g, '').replace(/^\s*[\r\n]/gm, '');
     if (checkName == freeSkillName) {
         setFreeSkill(details);
+        origin.freeSkill = details
     } else if (checkName == quickSkillsName) {
         setQuickSkills(details);
+        origin.quickSkills = details.split(/\n/g)
     } else if (checkName == growthName) {
         setGrowth(details);
+        origin.growth = details.split(/\n/g)
     } else if (checkName == learningName) {
         setLearning(details);
+        origin.learning = details.split(/\n/g)
     } else {
+        let allWords = property.details.split(',')
+        origin.name = allWords.shift()
+        origin.shortDescription = allWords.join(',')
         return property.name + ": " + property.details.replace(/\n/g, '<br>').replace(":", '<br>').replace("'", "&#39;") + '<br>' + '<br>'
     }
     return ""
@@ -43,9 +62,9 @@ export function handleGenerateClickOrigin(event) {
 export function process(event, future, handleFunction) {
     future.then(text => {
         let properties = JSON.parse(text).properties;
-        let details = ""
-        properties.forEach(p => details += handleFunction(p));
-        display.replaceText(details)
+        properties.forEach(p => handleFunction(p));
+        pc.setOrigin(origin)
+        display.replaceText("")
         display.update()
     })
         .catch(error => {

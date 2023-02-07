@@ -3,11 +3,11 @@ export function handleGenerateClickRequest(endpoint) {
     return handleClickRequest(`https://swn-generate.herokuapp.com/create/pc/${endpoint}`);
 }
 
-export function presetClickRequest(event) {
+export function presetOriginRequest(event) {
     return handleClickRequest(`https://swn-generate.herokuapp.com/create/pc/origin/${event.target.id}`);
 }
 
-export function makeUsersRequest() {
+export function makeAllOriginsRequest() {
     return handleClickRequest(`https://swn-generate.herokuapp.com/create/pc/origin/all`);
 }
 

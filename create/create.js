@@ -1,4 +1,4 @@
-import { handleGenerateClickOrigin, handlePresetClickOrigin, handleUsersRequest } from "./handlers/origin.js";
+import { handleGenerateClickOrigin, handlePresetClickOrigin, handleAllOriginsRequest } from "./handlers/origin.js";
 import { addSkillsTooltip, handleSkillsButton } from "./handlers/skills.js";
 import { handleGenerateClickStats, handleClickPickStats, initStatNames } from "./handlers/stats.js";
 import { createTippyInstance } from "./tippy/tippy.js";
@@ -24,7 +24,7 @@ function initPreset(user, div) {
 
 initStatNames()
 const origin = document.getElementById("origin")
-handleUsersRequest(origin.parentNode).then(users => {
+handleAllOriginsRequest(origin.parentNode).then(users => {
   users.reverse().forEach(user => {
     initPreset(user, origin.parentNode);
   });

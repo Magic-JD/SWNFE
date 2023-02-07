@@ -58,7 +58,7 @@ function setToGrid(div) {
     div.style.gridGap = "16px"
 }
 
-let display = new Display(document.getElementById("title").nextElementSibling);
+let display = new Display(document.getElementById("pc-display").nextElementSibling);
 display.show()
 
 
