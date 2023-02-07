@@ -12,6 +12,7 @@ let availableSkills = []
 
 let display = getDisplay();
 let pc = getPC()
+let statCount = 0
 
 export function addSkillsTooltip(element) {
   const id = element.id;
@@ -24,148 +25,177 @@ export function addSkillsTooltip(element) {
   }
 }
 
-export function handleSkillsButton(event) {
-  const button = event.target;
-  const id = button.id;
-  if (id == "skills-quick") {
-    display.clear()
-    pc.origin.quickSkills.forEach(skill => makeSkillsUpdateRequest([], skill, []).then(text => {
-      const furtherSkills = JSON.parse(text)
-      if (furtherSkills.followUp.length > 0) {
-        furtherSkills.followUp.forEach(choice => {
-          event.target.parentNode.prepend(createSkillAddButton(choice.name.toLowerCase, choice.name, choice.description));
-        })
-      } else {
-        pc.addSkill(furtherSkills.toAdd)
-        updateRolls(event.target.parentNode)
-      }
-    }))
-  } else if (id == "skills-pick") {
-    availableSkills = pc.origin.learning.filter(s => s != "Any Skill")
-    makeSkillsUpdateRequest([], pc.origin.freeSkill, availableSkills).then(text => {
-      const furtherSkills = JSON.parse(text)
-      availableSkills = furtherSkills.choices;
-      const parentNode = button.parentNode
-      display.clear()
-      display.setToGrid()
-      if (furtherSkills.followUp.length > 0) {
-        furtherSkills.followUp.forEach(choice => {
-          parentNode.prepend(createSkillAddButton(choice.name.toLowerCase, choice.name, choice.description));
-        })
-      } else {
-        pc.addSkill(furtherSkills.toAdd)
-        skillsRollCount = 1
-        availableSkills.forEach(choice => {
-          parentNode.prepend(createSkillAddButton(choice.name.toLowerCase, choice.name, choice.description));
-        })
-      }
+export function handleSkillsRollButton(event) {
+  const parentNode = event.target.parentNode
+  makeSkillsUpdateRequest([], pc.origin.freeSkill, []).then(text => {
+    const furtherSkills = JSON.parse(text)
+    skillsRollCount = -1;
+    followUpOrReInit(furtherSkills, parentNode, choiceToGenerate, () => skillsGenerateReinit(furtherSkills, parentNode))
+  });
+}
+
+export function handleSkillsPickButton(event) {
+  const parentNode = event.target.parentNode;
+  availableSkills = pc.origin.learning.filter(s => s != "Any Skill");
+  makeSkillsUpdateRequest([], pc.origin.freeSkill, availableSkills).then(text => {
+    const furtherSkills = JSON.parse(text);
+    availableSkills = furtherSkills.choices;
+    display.clear();
+    display.setToGrid();
+    followUpOrReInit(furtherSkills, parentNode, choiceToSkill, () => skillsPickReinit(furtherSkills, parentNode))
+  });
+}
+
+function skillsPickReinit(furtherSkills, parentNode) {
+  pc.addSkill(furtherSkills.toAdd);
+  skillsRollCount = 1;
+  skillsForEach(parentNode, choiceToSkill);
+}
+
+function skillsForEach(parentNode, fun) {
+  availableSkills.forEach(choice => {
+    parentNode.prepend(fun(choice));
+  });
+}
+
+function addButtonReInit(furtherChoices, parentNode) {
+  simpleReinit(furtherChoices)
+  furtherChoices.choices.forEach(choice => {
+    parentNode.prepend(createSkillButton(choice.name.toLowerCase, choice.name, skillAddButtonListener(choice.name), choice.description));
+  });
+}
+
+function skillsGenerateReinit(furtherSkills, parentNode) {
+  simpleReinit(furtherSkills)
+  addGrowthAndLearningListeners(parentNode);
+}
+
+function simpleReinit(furtherSkills) {
+  pc.addSkill(furtherSkills.toAdd);
+  updateRolls();
+}
+
+export function handleQuickSkillsButton(event) {
+  const parentNode = event.target.parentNode
+  pc.origin.quickSkills.forEach(skill => makeSkillsUpdateRequest([], skill, []).then(text => {
+    const furtherSkills = JSON.parse(text);
+    followUpOrReInit(furtherSkills, parentNode, choiceToSkill, () => simpleReinit(furtherSkills, parentNode));
+  }));
+}
+
+function choiceToSkill(choice) {
+  return createSkillButton(choice.name.toLowerCase, choice.name, skillAddButtonListener(choice.name), choice.description);
+}
+
+function choiceToGenerate(choice) {
+  return createSkillButton(choice.name.toLowerCase, choice.name, addButtonFromGenerateListener(choice.name), choice.description);
+}
+
+function followUpOrReInit(furtherSkills, parentNode, followUpFunction, reinitFunction) {
+  display.clear();
+  display.setToGrid();
+  if (furtherSkills.followUp.length > 0) {
+    furtherSkills.followUp.forEach(choice => {
+      parentNode.prepend(followUpFunction(choice));
     });
-  } else if (id == "skills-roll") {
-    makeSkillsUpdateRequest([], pc.origin.freeSkill, []).then(text => {
-      const furtherSkills = JSON.parse(text)
-      const parentNode = button.parentNode
-      display.clear()
-      display.setToGrid()
-      skillsRollCount = -1;
-      if (furtherSkills.followUp.length > 0) {
-        furtherSkills.followUp.forEach(choice => {
-          parentNode.prepend(createSkillAddButtonFromGenerate(choice.name.toLowerCase, choice.name, choice.description));
-        })
-      } else {
-        pc.addSkill(furtherSkills.toAdd)
-        parentNode.prepend(createSkillRollOnTableButton("growth", growthName, handleRollOnTableGrowth));
-        parentNode.prepend(createSkillRollOnTableButton("learning", learningName, handleRollOnTableLearning));
-        updateRolls(parentNode)
-      }
-    });
+  } else {
+    reinitFunction();
   }
 }
 
-function createSkillRollOnTableButton(id, details, listener) {
+function createSkillButton(id, details, listener, description) {
   const element = document.createElement("button");
   element.id = id
   element.innerHTML = details
+  if (description) {
+    createTippyInstance(element).setContent(description);
+  }
   element.addEventListener("click", listener);
   return element
 }
 
-function createSkillAddButtonFromGenerate(id, details, description) {
-  const element = document.createElement("button");
-  element.id = id
-  element.innerHTML = details
-  if(description){
-    createTippyInstance(element).setContent(description);
-  }
-  element.addEventListener("click", event => {
+function addButtonFromGenerateListener(details) {
+  return event => {
     makeSkillsUpdateRequest(pc.skills, details, availableSkills.map(skill => skill.name)).then(text => {
-      const furtherChoices = JSON.parse(text)
-      display.clear()
-      pc.addSkill(furtherChoices.toAdd)
-      element.parentNode.prepend(createSkillRollOnTableButton("growth", growthName, handleRollOnTableGrowth));
-      element.parentNode.prepend(createSkillRollOnTableButton("learning", learningName, handleRollOnTableLearning));
-      updateRolls(element.parentNode)
-    })
-  });
-  return element
+      const furtherChoices = JSON.parse(text);
+      const parentNode = event.target.parentNode
+      display.clear();
+      pc.addSkill(furtherChoices.toAdd);
+      addGrowthAndLearningListeners(parentNode);
+      updateRolls();
+    });
+  };
 }
 
 
-function createSkillAddButton(id, details, description) {
-  const element = document.createElement("button");
-  element.id = id
-  element.innerHTML = details
-  if(description){
-    createTippyInstance(element).setContent(description);
-  }
-  element.addEventListener("click", event => {
+function skillAddButtonListener(details) {
+  return event => {
     makeSkillsUpdateRequest(pc.skills, details, availableSkills.map(skill => skill.name)).then(text => {
-      const furtherChoices = JSON.parse(text)
-      display.clear()
-      if (furtherChoices.followUp.length > 0) {
-        furtherChoices.followUp.forEach(choice => {
-          element.parentNode.prepend(createSkillAddButton(choice.name.toLowerCase, choice.name, choice.description));
-        })
-      } else {
-        pc.addSkill(furtherChoices.toAdd)
-        furtherChoices.choices.forEach(choice => {
-          element.parentNode.prepend(createSkillAddButton(choice.name.toLowerCase, choice.name, choice.description));
-        })
-        updateRolls(element.parentElement)
-      }
-    })
-  });
-  return element
+      const furtherChoices = JSON.parse(text);
+      const parentNode = event.target.parentNode
+      followUpOrReInit(furtherChoices, parentNode, choiceToSkill, () => addButtonReInit(furtherChoices, parentNode));
+    });
+  };
 }
 
-function handleRollOnTableGrowth(event) {
-  handleRollOnTable(event, makeRollOnTableRequest(pc.skills, growthName, pc.origin.growth.join('\n')))
-}
-
-function handleRollOnTableLearning(event) {
-  handleRollOnTable(event, makeRollOnTableRequest(pc.skills, learningName, pc.origin.learning.join('\n')))
-}
-
-function handleRollOnTable(event, fun) {
+function handleRollOnTable(parentNode, fun) {
   fun.then(text => {
     let furtherChoices = JSON.parse(text);
-    const parentNode = event.target.parentNode
-    display.clear()
-    if (furtherChoices.followUp.length > 0) {
-      furtherChoices.followUp.forEach(choice => {
-        parentNode.prepend(createSkillAddButtonFromGenerate(choice.name.toLowerCase, choice.name, choice.description));
-      })
-    } else {
-      pc.addSkill(furtherChoices.toAdd)
-      parentNode.prepend(createSkillRollOnTableButton("growth", growthName, handleRollOnTableGrowth));
-      parentNode.prepend(createSkillRollOnTableButton("learning", learningName, handleRollOnTableLearning));
-      updateRolls(event.target.parentNode)
-    }
-  }).catch(error => {
-    console.error('Error fetching data:', error)
+    followUpOrReInit(furtherChoices, parentNode, choiceToGenerate, () => rollReInit(furtherChoices, parentNode));
   })
 }
 
-function updateRolls(parentNode) {
+function rollReInit(furtherChoices, parentNode) {
+  if (furtherChoices.toAdd.startsWith('+')) {
+    const growStats = furtherChoices.toAdd
+    const statsList = pc.stats
+    display.clear()
+    display.addText(furtherChoices.toAdd + '<br>')
+    if (growStats == "+2 Physical") {
+      statCount = 2
+      statsList.slice(0, 3).filter(stat => stat.value < 18)
+        .forEach(stat => { parentNode.append(createSkillButton(stat.name.toLowerCase, stat.name, growthAddStatListener(stat))) })
+    } else if (growStats == "+2 Mental") {
+      statCount = 2
+      statsList.slice(3, 6).filter(stat => stat.value < 18)
+        .forEach(stat => { parentNode.append(createSkillButton(stat.name.toLowerCase, stat.name, growthAddStatListener(stat))) })
+    } else {
+      statCount = 1
+      statsList.filter(stat => stat.value < 18)
+        .forEach(stat => { parentNode.append(createSkillButton(stat.name.toLowerCase, stat.name, growthAddStatListener(stat))) })
+    }
+  } else {
+    simpleReinit(furtherChoices)
+    addGrowthAndLearningListeners(parentNode);
+  }
+}
+
+function growthAddStatListener(stat) {
+  return event => {
+    let currentValue = stat.value;
+    currentValue += 1
+    pc.updateStat(stat.name, currentValue)
+    statCount-=1
+    if (statCount <= 0) {
+      addGrowthAndLearningListeners(event.target.parentNode)
+      updateRolls()
+    } else if (currentValue == 18) {
+      event.target.style.display = "none"
+    }
+  };
+}
+
+function addGrowthAndLearningListeners(parentNode) {
+  display.clear()
+  parentNode.prepend(createSkillButton("growth", growthName, function (event) {
+    handleRollOnTable(event.target.parentNode, makeRollOnTableRequest(pc.skills, growthName, pc.origin.growth.join('\n')))
+  }, pc.origin.growth.join('<br>')));
+  parentNode.prepend(createSkillButton("learning", learningName, function (event) {
+    handleRollOnTable(event.target.parentNode, makeRollOnTableRequest(pc.skills, learningName, pc.origin.learning.join('\n')))
+  }, pc.origin.learning.join('<br>')));
+}
+
+function updateRolls() {
   skillsRollCount += 1;
   if (skillsRollCount == 3) {
     display.update();

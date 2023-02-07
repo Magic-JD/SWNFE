@@ -1,5 +1,5 @@
 import { handleGenerateClickOrigin, handlePresetClickOrigin, handleAllOriginsRequest } from "./handlers/origin.js";
-import { addSkillsTooltip, handleSkillsButton } from "./handlers/skills.js";
+import { addSkillsTooltip, handleSkillsRollButton, handleQuickSkillsButton, handleSkillsPickButton } from "./handlers/skills.js";
 import { handleGenerateClickStats, handleClickPickStats, initStatNames } from "./handlers/stats.js";
 import { createTippyInstance } from "./tippy/tippy.js";
 import { handlePickClass, handlePickAdventurer } from "./handlers/class.js";
@@ -42,8 +42,11 @@ const observer = new MutationObserver((mutations) => {
     }
   });
 });
+document.getElementById('skills-quick').addEventListener('click', handleQuickSkillsButton)
+document.getElementById('skills-pick').addEventListener('click', handleSkillsPickButton)
+document.getElementById('skills-roll').addEventListener('click', handleSkillsRollButton)
+
 document.querySelectorAll(`[id^="skills"]`).forEach(element => {
-  element.addEventListener('click', handleSkillsButton);
   observer.observe(element, { attributes: true });
 }
 );
