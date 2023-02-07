@@ -32,8 +32,10 @@ function handleDisplay(div, display) {
     if (next != null) {
         activate(next)
     }
+    div.parentNode.removeChild(display.infoElement)
     display.setDiv(next);
     div.parentNode.removeChild(div)
+    
 }
 
 function shutdown(div) {

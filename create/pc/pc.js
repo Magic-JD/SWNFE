@@ -19,10 +19,20 @@ class PC {
         }
         this.displayOrigin = function () { return this.origin ? `${this.origin.name}: ${this.origin.shortDescription}` : '' }
         this.skills = []
+        this.addSkill = function (skill) {
+            this.skills.push(skill);
+            this.updateDisplay();
+        }
+        this.displaySkills = function () { return this.skills.join('<br>') }
         this.class = []
+        this.displayClass = function () { return this.class.join('<br>') }
+        this.addClass = function (string) {
+            this.class.push(string)
+            this.updateDisplay()
+        }
         this.foci = []
         this.toString = function () {
-            return `${this.displayStats()} <br><br> ${this.displayOrigin()}`
+            return `${this.displayStats()}<br><br>${this.displayOrigin()}<br><br>${this.displaySkills()}<br><br>${this.displayClass()}`
         }
         this.updateDisplay = function () {
             this.div.innerHTML = this.toString()

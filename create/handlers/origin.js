@@ -1,5 +1,5 @@
-import { quickSkillsName, setQuickSkills, freeSkillName, setFreeSkill, learningName, setLearning, growthName, setGrowth } from "./skills.js";
-import {presetOriginRequest, makeAllOriginsRequest, handleGenerateClickRequest } from "./requests/requests.js";
+import { quickSkillsName, freeSkillName, learningName, growthName } from "./skills.js";
+import { presetOriginRequest, makeAllOriginsRequest, handleGenerateClickRequest } from "./requests/requests.js";
 import { getDisplay } from "../display/display.js";
 import { getPC } from "../pc/pc.js";
 
@@ -35,17 +35,13 @@ function originToString(property) {
     const checkName = property.name.replace(/\n/g, '').replace(/^\s*[\r\n]/gm, '');
     const details = property.details.replace(/-0/g, '').replace(/^\s*[\r\n]/gm, '');
     if (checkName == freeSkillName) {
-        setFreeSkill(details);
         origin.freeSkill = details
     } else if (checkName == quickSkillsName) {
-        setQuickSkills(details);
-        origin.quickSkills = details.split(/\n/g)
+        origin.quickSkills = details.split(/\n/g).filter(s => s)
     } else if (checkName == growthName) {
-        setGrowth(details);
-        origin.growth = details.split(/\n/g)
+        origin.growth = details.split(/\n/g).filter(s => s)
     } else if (checkName == learningName) {
-        setLearning(details);
-        origin.learning = details.split(/\n/g)
+        origin.learning = details.split(/\n/g).filter(s => s)
     } else {
         let allWords = property.details.split(',')
         origin.name = allWords.shift()

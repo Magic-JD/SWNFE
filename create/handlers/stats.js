@@ -13,13 +13,14 @@ export function initStatNames() {
 
 export function handleClickPickStats(event) {
   handleGenerateClickRequest("stat-block").then(text => {
-    pc.setStats(JSON.parse(text).properties.map(p => new Stat(p.name, p.value, p.priority)));
+    const stats = JSON.parse(text).properties.map(p => new Stat(p.name, p.value, p.priority));
     display.replaceText(createStatApplyString())
     display.clear()
-    pc.stats.forEach(stat => {
+    stats.forEach(stat => {
       stat.value = 0;
       event.target.parentNode.append(createStatAddButton(stat.name.toLowerCase, stat.name, pickStatListener));
     })
+    pc.setStats(stats)
   })
 
 }

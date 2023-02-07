@@ -1,15 +1,17 @@
 import { getDisplay } from "../display/display.js";
+import { getPC } from "../pc/pc.js";
 
+let pc = getPC()
 let display = getDisplay()
 let count = 0;
 
 export function handlePickClass(event) {
-  display.addText(event.target.innerHTML)
+  pc.addClass(event.target.innerHTML)
   display.update()
 }
 
 export function handlePickAdventurer(event){
-    display.addText(event.target.innerHTML)
+    pc.addClass(event.target.innerHTML)
     display.clear()
     display.div.append(createPartialClassButton("partial-warrior", "Partial Warrior"))
     display.div.append(createPartialClassButton("partial-expert", "Partial Expert"))
@@ -27,7 +29,7 @@ function createPartialClassButton(id, details) {
   function createPartialClassListener(event){
     count += 1
     const element = event.target
-    display.addText(`<br>${element.innerHTML}`)
+    pc.addClass(element.innerHTML)
     element.style.display = "none"
     if(count == 2){
         display.update()
