@@ -66,8 +66,8 @@ function addButtonReInit(furtherChoices, parentNode) {
 }
 
 function skillsGenerateReinit(furtherSkills, parentNode) {
-  simpleReinit(furtherSkills)
   addGrowthAndLearningListeners(parentNode);
+  simpleReinit(furtherSkills)
 }
 
 function simpleReinit(furtherSkills) {
@@ -165,8 +165,8 @@ function rollReInit(furtherChoices, parentNode) {
         .forEach(stat => { parentNode.append(createSkillButton(stat.name.toLowerCase, stat.name, growthAddStatListener(stat))) })
     }
   } else {
-    simpleReinit(furtherChoices)
     addGrowthAndLearningListeners(parentNode);
+    simpleReinit(furtherChoices)
   }
 }
 

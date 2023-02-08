@@ -7,6 +7,7 @@ let count = 0;
 
 export function handlePickClass(event) {
   pc.addClass(event.target.innerHTML)
+  pc.initClassStats()
   display.update()
 }
 
@@ -32,6 +33,7 @@ function createPartialClassButton(id, details) {
     pc.addClass(element.innerHTML)
     element.style.display = "none"
     if(count == 2){
+        pc.initClassStats()
         display.update()
     }
   }

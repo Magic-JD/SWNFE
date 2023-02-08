@@ -11,6 +11,10 @@ export function makeAllOriginsRequest() {
     return handleClickRequest(`https://swn-generate.herokuapp.com/create/pc/origin/all`);
 }
 
+export function makeAllFociRequest(){
+    return handleClickRequest(`https://swn-generate.herokuapp.com/create/pc/foci/all`);
+}
+
 export function makeRollOnTableRequest(chosen, requestName, tableData) {
     return fetch(`https://swn-generate.herokuapp.com/create/pc/skills/generate`, {
         method: 'POST',

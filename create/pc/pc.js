@@ -1,6 +1,63 @@
 class PC {
     constructor(div) {
         this.div = div
+        this.hp = null;
+        this.attackBonus = null;
+        this.savingThrow = null;
+        this.initClassStats = function () {
+            let calculated = Math.floor(Math.random() * 6) + 1
+            if(this.class.find(s => s.includes("Warrior"))){
+                calculated += 2;
+            }
+            calculated += this.stats.filter(s => s.name == "Constitution").map(s => s.mod())[0]
+            this.hp = Math.max(1, calculated)
+            
+            this.attackBonus = 0;
+            if(this.class.find(s => s.includes("Warrior"))){
+                this.attackBonus += 1;
+            }
+
+            this.savingThrow = []
+            let stats = this.stats
+            this.savingThrow.push({
+                name: 'Physical',
+                value: 15 - Math.max(stats.find(s => s.name == "Strength").mod(), stats.find(s => s.name == "Constitution").mod())
+            })
+            this.savingThrow.push({
+                name: 'Evasion',
+                value: 15 - Math.max(stats.find(s => s.name == "Intelligence").mod(), stats.find(s => s.name == "Dexterity").mod())
+            })
+            this.savingThrow.push({
+                name: 'Mental',
+                value: 15 - Math.max(stats.find(s => s.name == "Wisdom").mod(), stats.find(s => s.name == "Charisma").mod())
+            })
+
+            this.updateDisplay()
+        }
+        this.displayHP = function () {
+            if(this.hp){
+                return `HP: ${this.hp}`
+            } else {
+                return ''
+            }
+            
+        }
+        this.displayAttackBonus = function(){
+            if(this.attackBonus != null){
+                return `Attack Bonus: ${this.attackBonus}`
+            } else {
+                return ''
+            }
+            
+        }
+        this.displaySavingThrows = function(){
+            if(this.savingThrow){
+                return `Saving Throws:<br>${this.savingThrow.map(ab => `${ab.name}: ${ab.value}`).join('<br>')}`
+            } else {
+                return ''
+            }
+            
+        }
         this.stats = [] //see stat
         this.setStats = function (statList) {
             this.stats = statList.sort((a, b) => a.priority - b.priority)
@@ -32,7 +89,7 @@ class PC {
         }
         this.foci = []
         this.toString = function () {
-            return `${this.displayStats()}<br><br>${this.displayOrigin()}<br><br>${this.displaySkills()}<br><br>${this.displayClass()}`
+            return [this.displayStats(), this.displayOrigin(), this.displaySkills(), this.displayClass(), this.displayHP(), this.displayAttackBonus(), this.displaySavingThrows()].filter(str => str != '').join('<br><br>')
         }
         this.updateDisplay = function () {
             this.div.innerHTML = this.toString()
