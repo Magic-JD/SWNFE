@@ -6,14 +6,14 @@ class PC {
         this.savingThrow = null;
         this.initClassStats = function () {
             let calculated = Math.floor(Math.random() * 6) + 1
-            if(this.class.find(s => s.includes("Warrior"))){
+            if (this.class.find(s => s.includes("Warrior"))) {
                 calculated += 2;
             }
             calculated += this.stats.filter(s => s.name == "Constitution").map(s => s.mod())[0]
             this.hp = Math.max(1, calculated)
-            
+
             this.attackBonus = 0;
-            if(this.class.find(s => s.includes("Warrior"))){
+            if (this.class.find(s => s.includes("Warrior"))) {
                 this.attackBonus += 1;
             }
 
@@ -35,28 +35,25 @@ class PC {
             this.updateDisplay()
         }
         this.displayHP = function () {
-            if(this.hp){
+            if (this.hp) {
                 return `HP: ${this.hp}`
             } else {
                 return ''
             }
-            
         }
-        this.displayAttackBonus = function(){
-            if(this.attackBonus != null){
+        this.displayAttackBonus = function () {
+            if (this.attackBonus != null) {
                 return `Attack Bonus: ${this.attackBonus}`
             } else {
                 return ''
             }
-            
         }
-        this.displaySavingThrows = function(){
-            if(this.savingThrow){
+        this.displaySavingThrows = function () {
+            if (this.savingThrow) {
                 return `Saving Throws:<br>${this.savingThrow.map(ab => `${ab.name}: ${ab.value}`).join('<br>')}`
             } else {
                 return ''
             }
-            
         }
         this.stats = [] //see stat
         this.setStats = function (statList) {
@@ -95,7 +92,6 @@ class PC {
             this.div.innerHTML = this.toString()
         }
     }
-
 }
 
 export class Stat {
