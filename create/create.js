@@ -1,6 +1,7 @@
 import { handleGenerateClickOrigin, handlePresetClickOrigin, handleAllOriginsRequest } from "./handlers/origin.js";
 import { addSkillsTooltip, handleSkillsRollButton, handleQuickSkillsButton, handleSkillsPickButton } from "./handlers/skills.js";
 import { handleGenerateClickStats, handleClickPickStats, initStatNames } from "./handlers/stats.js";
+import { handleAllFociRequest, showFoci } from "./handlers/foci.js";
 import { createTippyInstance } from "./tippy/tippy.js";
 import { handlePickClass, handlePickAdventurer } from "./handlers/class.js";
 
@@ -23,6 +24,7 @@ function initPreset(user, div) {
 }
 
 initStatNames()
+handleAllFociRequest()
 const origin = document.getElementById("origin")
 handleAllOriginsRequest(origin.parentNode).then(users => {
   users.reverse().forEach(user => {
@@ -33,11 +35,20 @@ handleAllOriginsRequest(origin.parentNode).then(users => {
 document.getElementById("stat-block-generate").addEventListener('click', handleGenerateClickStats);
 document.getElementById("stat-block-pick").addEventListener('click', handleClickPickStats);
 origin.addEventListener('click', handleGenerateClickOrigin);
-const observer = new MutationObserver((mutations) => {
+const skillsObserver = new MutationObserver((mutations) => {
   mutations.forEach((mutation) => {
     if (mutation.attributeName === "style") {
       if (getComputedStyle(mutation.target).display === "block") {
         addSkillsTooltip(mutation.target)
+      }
+    }
+  });
+});
+const fociObserver = new MutationObserver((mutations) => {
+  mutations.forEach((mutation) => {
+    if (mutation.attributeName === "style") {
+      if (getComputedStyle(mutation.target).display === "block") {
+        showFoci()
       }
     }
   });
@@ -47,9 +58,10 @@ document.getElementById('skills-pick').addEventListener('click', handleSkillsPic
 document.getElementById('skills-roll').addEventListener('click', handleSkillsRollButton)
 
 document.querySelectorAll(`[id^="skills"]`).forEach(element => {
-  observer.observe(element, { attributes: true });
+  skillsObserver.observe(element, { attributes: true });
 }
 );
+fociObserver.observe(document.getElementById('foci'), {attributes: true})
 
 document.querySelectorAll(`[id^="class"]`).forEach(element => {
   element.addEventListener('click', handlePickClass);

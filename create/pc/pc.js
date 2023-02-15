@@ -85,8 +85,15 @@ class PC {
             this.updateDisplay()
         }
         this.foci = []
+        this.addFoci = function (fociName){
+            this.foci.push(fociName)
+            this.updateDisplay()
+        }
+        this.displayFoci = function() {
+            return this.foci.join('<br>')
+        }
         this.toString = function () {
-            return [this.displayStats(), this.displayOrigin(), this.displaySkills(), this.displayClass(), this.displayHP(), this.displayAttackBonus(), this.displaySavingThrows()].filter(str => str != '').join('<br><br>')
+            return [this.displayStats(), this.displayOrigin(), this.displaySkills(), this.displayClass(), this.displayHP(), this.displayAttackBonus(), this.displaySavingThrows(), this.displayFoci()].filter(str => str != '').join('<br><br>')
         }
         this.updateDisplay = function () {
             this.div.innerHTML = this.toString()
