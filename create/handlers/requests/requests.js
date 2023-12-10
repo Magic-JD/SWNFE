@@ -1,22 +1,22 @@
 
 export function handleGenerateClickRequest(endpoint) {
-    return handleClickRequest(`https://swn-generate.herokuapp.com/create/pc/${endpoint}`);
+    return handleClickRequest(`https://swn.onrender.com/create/pc/${endpoint}`);
 }
 
 export function presetOriginRequest(event) {
-    return handleClickRequest(`https://swn-generate.herokuapp.com/create/pc/origin/${event.target.id}`);
+    return handleClickRequest(`https://swn.onrender.com/create/pc/origin/${event.target.id}`);
 }
 
 export function makeAllOriginsRequest() {
-    return handleClickRequest(`https://swn-generate.herokuapp.com/create/pc/origin/all`);
+    return handleClickRequest(`https://swn.onrender.com/create/pc/origin/all`);
 }
 
 export function makeAllFociRequest(){
-    return handleClickRequest(`https://swn-generate.herokuapp.com/create/pc/foci/all`);
+    return handleClickRequest(`https://swn.onrender.com/create/pc/foci/all`);
 }
 
 export function makeRollOnTableRequest(chosen, requestName, tableData) {
-    return fetch(`https://swn-generate.herokuapp.com/create/pc/skills/generate`, {
+    return fetch(`https://swn.onrender.com/create/pc/skills/generate`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -36,7 +36,7 @@ export function makeRollOnTableRequest(chosen, requestName, tableData) {
 }
 
 export function makeSkillsUpdateRequest(chosen, pending, available) {
-    return fetch(`https://swn-generate.herokuapp.com/create/pc/skills/update`, {
+    return fetch(`https://swn.onrender.com/create/pc/skills/update`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
