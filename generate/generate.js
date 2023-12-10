@@ -24,7 +24,7 @@ function handleButtonClick(event) {
       break
   }
 
-  fetch(`https://swn-generate.herokuapp.com/generate/${endpoint}`, { method: 'GET' })
+  fetch(`https://swn.onrender.com/generate/${endpoint}`, { method: 'GET' })
     .then(response => {
       if (!response.ok) {
         throw new Error(response.statusText)
